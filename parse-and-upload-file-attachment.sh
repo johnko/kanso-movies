@@ -19,30 +19,30 @@ SAFENAME=`echo ${FILE##*/} | tr ' ' '_' | tr -cd '[[:alnum:]]._-' | tr '[' '-' |
 ffmetadata() {
     ffmpeg -i "${FILE}" -f ffmetadata -vn -an -loglevel quiet -
     LOOKSLIKE="
-title=Let's Stay Together
-artist=Al Green
-album_artist=Al Green
-album=Greatest Hits
-genre=R&B/Soul
-track=6/10
+title=The Mask 2
+director=Name
+series=The Mask
+season=
+episode=
+genre=Comedy
 disc=1/1
 "
 }
 
 getmeta() {
-      ARTIST="`ffmetadata|grep '^artist='       |sed 's/^artist=//'      |tr '"' "'"`"
-       TITLE="`ffmetadata|grep '^title='        |sed 's/^title=//'       |tr '"' "'"`"
-       ALBUM="`ffmetadata|grep '^album='        |sed 's/^album=//'       |tr '"' "'"`"
-ALBUM_ARTIST="`ffmetadata|grep '^album_artist=' |sed 's/^album_artist=//'|tr '"' "'"`"
-       GENRE="`ffmetadata|grep '^genre='        |sed 's/^genre=//'       |tr '"' "'"`"
-       TRACK="`ffmetadata|grep '^track='        |sed 's/^track=//'       |tr '"' "'"`"
-        DISC="`ffmetadata|grep '^disc='         |sed 's/^disc=//'        |tr '"' "'"`"
-    [ "x" != "x${ARTIST}" ] &&             ARTIST="\"artist\":      \"${ARTIST}\","
+    DIRECTOR="`ffmetadata|grep '^director='     |sed 's/^director=//'    | sed 's/\\\=/_/g'| sed 's/\\\#/_/g'| tr '"' "'"`"
+       TITLE="`ffmetadata|grep '^title='        |sed 's/^title=//'       | sed 's/\\\=/_/g'| sed 's/\\\#/_/g'| tr '"' "'"`"
+      SERIES="`ffmetadata|grep '^series='       |sed 's/^series=//'      | sed 's/\\\=/_/g'| sed 's/\\\#/_/g'| tr '"' "'"`"
+      SEASON="`ffmetadata|grep '^season='       |sed 's/^season=//'      | sed 's/\\\=/_/g'| sed 's/\\\#/_/g'| tr '"' "'"`"
+       GENRE="`ffmetadata|grep '^genre='        |sed 's/^genre=//'       | sed 's/\\\=/_/g'| sed 's/\\\#/_/g'| tr '"' "'"`"
+     EPISODE="`ffmetadata|grep '^episode='      |sed 's/^episode=//'     | sed 's/\\\=/_/g'| sed 's/\\\#/_/g'| tr '"' "'"`"
+        DISC="`ffmetadata|grep '^disc='         |sed 's/^disc=//'        | sed 's/\\\=/_/g'| sed 's/\\\#/_/g'| tr '"' "'"`"
+    [ "x" != "x${DIRECTOR}" ] &&         DIRECTOR="\"director\":    \"${DIRECTOR}\","
     [ "x" != "x${TITLE}" ] &&               TITLE="\"title\":       \"${TITLE}\","
-    [ "x" != "x${ALBUM}" ] &&               ALBUM="\"album\":       \"${ALBUM}\","
-    [ "x" != "x${ALBUM_ARTIST}" ] && ALBUM_ARTIST="\"album_artist\":\"${ALBUM_ARTIST}\","
+    [ "x" != "x${SERIES}" ] &&             SERIES="\"series\":      \"${SERIES}\","
+    [ "x" != "x${SEASON}" ] &&             SEASON="\"season\":      \"${SEASON}\","
     [ "x" != "x${GENRE}" ] &&               GENRE="\"genre\":       \"${GENRE}\","
-    [ "x" != "x${TRACK}" ] &&               TRACK="\"track\":       \"${TRACK}\","
+    [ "x" != "x${EPISODE}" ] &&           EPISODE="\"episode\":     \"${EPISODE}\","
     [ "x" != "x${DISC}" ] &&                 DISC="\"disc\":        \"${DISC}\","
     [ "x" == "x${TITLE}" ] &&               TITLE="\"title\":       \"${SAFENAME}\","
 }
@@ -59,25 +59,20 @@ HEXHASH=`openssl dgst -sha512 -hex "${FILE}" | awk '{print $NF}'`
 BHASH=`openssl dgst -sha512 -binary "${FILE}" | openssl enc -base64 | tr -d '\n'`
 
 # Set the upload type
-if echo "${MIME}" | grep "audio/mpeg" >/dev/null ; then
+if echo "${MIME}" | grep "video/x-matroska" >/dev/null ; then
     # mp3
     # We can parse ID3
-    TYPE=song
+    TYPE=mkv
     getmeta
-elif echo "${MIME}" | grep "audio/mp4" >/dev/null ; then
+elif echo "${MIME}" | grep "video/mp4" >/dev/null ; then
     # m4a
     # We can parse, but may have to convert
-    TYPE=m4a
+    TYPE=mp4
     getmeta
-elif echo "${MIME}" | grep "audio/x-wav" >/dev/null ; then
+elif echo "${MIME}" | grep "video/x-msvideo" >/dev/null ; then
     # wav
     # We can parse, but may have to convert
-    TYPE=wav
-    getmeta
-elif echo "${MIME}" | grep "audio/x-flac" >/dev/null ; then
-    # flac
-    # We can parse, but may have to convert
-    TYPE=flac
+    TYPE=avi
     getmeta
 else
     echo "Not sure what it is, improper metadata"

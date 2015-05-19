@@ -20,7 +20,7 @@ $(window).on('resize', function() {
         $("#container").attr("class", "");
     }
     $(".col-sm-13").attr("style", "width:" + (win.width() - $(".col-sm-0").width() - 20) + "px");
-    $(".jp-playlist").attr("style", "height:" + (win.height() - $(".jp-interface").height() - $(".jp-jplayer").height() - 20) + "px");
+    $(".jp-playlist").attr("style", "height:" + (win.height() - $(".jp-gui").height() - $(".jp-jplayer").height() - 20) + "px");
 });
 
 /*
@@ -101,7 +101,7 @@ $.couch.app(function(app) {
 
 }, {
     db: "_db",
-    design: "music"
+    design: "movies"
 });
 
 $('#aboutLink').click(function(e) {

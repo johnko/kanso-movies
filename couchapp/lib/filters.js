@@ -2,8 +2,8 @@
  * Filter functions to be exported from the design doc for _changes filtering.
  */
 
-exports.songs = function(doc, req) {
-    if (doc.type && doc.type === 'song') {
+exports.videos = function(doc, req) {
+    if (doc.type && doc.type === 'mp4') {
         return true;
     } else {
         return false;

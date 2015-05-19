@@ -22,7 +22,7 @@ footer {
 }
 
 .col-sm-0 {
-    width: 250px;
+    width: 500px;
     float: left;
     min-height: 100px;
 }
@@ -31,29 +31,14 @@ footer {
     float: left;
 }
 
-.jp-audio {
-    width: 221px !important;
-    padding: 10px 10px !important;
-}
-
-.jp-progress {
-    width: 201px !important;
-}
-
 #container, #wrapper, #content, #inner-content, .row, .col-sm-0, #player, #jp_container_N, .jp-type-playlist {
     /*for playlist to get height of window*/
 
     height: 100%;
 }
 
-.smallheight .jp-jplayer {
-    width: 200px !important;
-    height: 200px !important;
-}
-
-.smallheight .jp-jplayer img {
-    width: 200px !important;
-    height: 200px !important;
+.jp-video-270p {
+    width: 482px !important;
 }
 
 .jp-playlist {
@@ -98,7 +83,7 @@ footer {
 a#logoutLink {
     float: right;
 }
-/** song list **/
+/** video list **/
 
 #list table {
     /*clear: both;*/
@@ -131,7 +116,7 @@ a#logoutLink {
     background: #fff;
 }
 
-#list tr.song:hover {
+#list tr.video:hover {
     background: #ddd;
 }
 

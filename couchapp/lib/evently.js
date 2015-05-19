@@ -11,7 +11,7 @@ exports.list = {
             $(this).trigger('setList', [list]);
         },
         query: {
-            "view": "songs",
+            "view": "videos",
             "include_docs": "true"
         }
     },
@@ -20,31 +20,25 @@ exports.list = {
     },
     setList: {
         after: function(e, data) {
-            // start of function setDOCmp3ANDposter
-            function setDOCmp3ANDposter(doc, name, type, prefix) {
-                    var mp3extensions = ['.mp3'];
-                    var imgextensions = ['.jpg', 'jpeg', '.png', '.gif'];
-                    if (doc.track) delete doc.track;
-                    if (!doc.mp3 && mp3extensions.indexOf(name.substring(name.length - 4).toLowerCase()) > -1) {
-                        if (type == "dtfc") {
-                            doc.mp3 = "/dtfc/" + doc.dtfc[name].sha512;
-                        } else if (type == "attachments") {
-                            doc.mp3 = prefix + encodeURIComponent(doc._id) + '/' + encodeURIComponent(name);
-                        }
-                        if (doc.supplied.length > 1) {
-                            doc.supplied += ', ';
-                        }
-                        doc.supplied += 'mp3';
-                    } else if (!doc.poster && imgextensions.indexOf(name.substring(name.length - 4).toLowerCase()) > -1) {
-                        if (type == "dtfc") {
-                            doc.poster = "/dtfc/" + doc.dtfc[name].sha512;
-                        } else if (type == "attachments") {
-                            doc.poster = prefix + encodeURIComponent(doc._id) + '/' + encodeURIComponent(name);
-                        }
+            // start of function setDOCmp4ANDposter
+            function setDOCmp4ANDposter(doc, name, type, prefix) {
+                var mp4extensions = ['.mp4'];
+                if (doc.track) delete doc.track;
+                if (!doc.m4v && mp4extensions.indexOf(name.substring(name.length - 4).toLowerCase()) > -1) {
+                    if (type == "dtfc") {
+                        doc.m4v = "/dtfc/" + doc.dtfc[name].sha512;
+                    } else if (type == "attachments") {
+                        doc.m4v = prefix + encodeURIComponent(doc._id) + '/' + encodeURIComponent(name);
                     }
-                    return doc;
+                    if (doc.supplied.length > 1) {
+                        doc.supplied += ', ';
+                    }
+                    doc.supplied += 'm4v';
                 }
-                // end of function setDOCmp3ANDposter
+                return doc;
+            }
+
+            // end of function setDOCmp4ANDposter
             var prefix = $$(this).app.db.uri;
             var doc;
             for (var i = 0; i < data.length; i++) {
@@ -52,14 +46,14 @@ exports.list = {
                 doc.supplied = '';
                 if (doc._attachments) {
                     for (var name2 in doc._attachments) {
-                        doc = setDOCmp3ANDposter(doc, name2, "attachments", prefix);
+                        doc = setDOCmp4ANDposter(doc, name2, "attachments", prefix);
                     }
                 } else if (doc.dtfc) {
                     for (var name in doc.dtfc) {
-                        doc = setDOCmp3ANDposter(doc, name, "dtfc", null);
+                        doc = setDOCmp4ANDposter(doc, name, "dtfc", null);
                     }
                 }
-                $('#song_' + doc._id).data('doc', doc);
+                $('#video_' + doc._id).data('doc', doc);
             }
         },
         data: function(e, data) {
@@ -67,16 +61,16 @@ exports.list = {
             var i = 0;
 
             return {
-                songs: data.map(function(r) {
+                videos: data.map(function(r) {
                     doc = r;
                     doc.rowClass = 'l' + (i++ % 2);
                     return doc;
                 })
             };
         },
-        mustache: "<table>\n\t<tr>\n\t\t<th class='artist'>Artist</th>\n\t\t<th class='title'>Title</th>\n\t\t<th class='album'>Album</th>\n\t</tr>\n{{#songs}}\n\t<tr class=\"song {{rowClass}}\" id=\"song_{{_id}}\">\n\t\t<td class='artist'>{{artist}}</td>\n\t\t<td class='title'>{{title}}</td>\n\t\t<td class='album'>{{album}}</td>\n\t</tr>\n{{/songs}}\n</table>",
+        mustache: "<table>\n\t<tr>\n\t\t<th class='title'>Title</th>\n\t\t<th class='genre'>Genre</th>\n\t</tr>\n{{#videos}}\n\t<tr class=\"video {{rowClass}}\" id=\"video_{{_id}}\">\n\t\t<td class='title'>{{title}}</td>\n\t\t<td class='genre'>{{genre}}</td>\n\t</tr>\n{{/videos}}\n</table>",
         selectors: {
-            "tr.song": {
+            "tr.video": {
                 click: function(e) {
                     var doc = $(this).data('doc');
                     var myPlaylist = $("#player").data('myPlaylist');
@@ -103,7 +97,7 @@ exports.player = {
                     enableRemoveControls: true
                 },
                 swfPath: "./vendor/jplayer/jplayer",
-                supplied: "m4a, oga, mp3",
+                supplied: "m4v, ogv, webm",
                 useStateClassSkin: true,
                 autoBlur: true,
                 smoothPlayBar: false,
@@ -115,34 +109,43 @@ exports.player = {
             $(window).trigger('resize');
         },
         mustache: " " +
-            '<div id="jp_container_N" class="jp-audio" role="application" aria-label="media player">' +
+            '<div id="jp_container_N" class="jp-video jp-video-270p" role="application" aria-label="media player">' +
             '	<div class="jp-type-playlist">' +
             '		<div id="jquery_jplayer_N" class="jp-jplayer"></div>' +
-            '		<div class="jp-gui jp-interface">' +
-            '			<div class="jp-volume-controls">' +
-            '				<button class="jp-mute" role="button" tabindex="0">mute</button>' +
-            '				<button class="jp-volume-max" role="button" tabindex="0">max volume</button>' +
-            '				<div class="jp-volume-bar">' +
-            '					<div class="jp-volume-bar-value"></div>' +
-            '				</div>' +
+            '		<div class="jp-gui">' +
+            '			<div class="jp-video-play">' +
+            '				<button class="jp-video-play-icon" role="button" tabindex="0">play</button>' +
             '			</div>' +
-            '			<div class="jp-controls-holder">' +
-            '				<div class="jp-controls">' +
-            '					<button class="jp-previous" role="button" tabindex="0">previous</button>' +
-            '					<button class="jp-play" role="button" tabindex="0">play</button>' +
-            '					<button class="jp-stop" role="button" tabindex="0">stop</button>' +
-            '					<button class="jp-next" role="button" tabindex="0">next</button>' +
-            '				</div>' +
+            '			<div class="jp-interface">' +
             '				<div class="jp-progress">' +
             '					<div class="jp-seek-bar">' +
             '						<div class="jp-play-bar"></div>' +
             '					</div>' +
             '				</div>' +
-            '				<div class="jp-current-time" role="timer" aria-label="time"></div>' +
-            '				<div class="jp-duration" role="timer" aria-label="duration"></div>' +
-            '				<div class="jp-toggles">' +
-            '					<button class="jp-repeat" role="button" tabindex="0">repeat</button>' +
-            '					<button class="jp-shuffle" role="button" tabindex="0">shuffle</button>' +
+            '				<div class="jp-current-time" role="timer" aria-label="time">&nbsp;</div>' +
+            '				<div class="jp-duration" role="timer" aria-label="duration">&nbsp;</div>' +
+            '				<div class="jp-controls-holder">' +
+            '					<div class="jp-controls">' +
+            '						<button class="jp-previous" role="button" tabindex="0">previous</button>' +
+            '						<button class="jp-play" role="button" tabindex="0">play</button>' +
+            '						<button class="jp-next" role="button" tabindex="0">next</button>' +
+            '						<button class="jp-stop" role="button" tabindex="0">stop</button>' +
+            '					</div>' +
+            '					<div class="jp-volume-controls">' +
+            '						<button class="jp-mute" role="button" tabindex="0">mute</button>' +
+            '						<button class="jp-volume-max" role="button" tabindex="0">max volume</button>' +
+            '						<div class="jp-volume-bar">' +
+            '							<div class="jp-volume-bar-value"></div>' +
+            '						</div>' +
+            '					</div>' +
+            '					<div class="jp-toggles">' +
+            '						<button class="jp-repeat" role="button" tabindex="0">repeat</button>' +
+            '						<button class="jp-shuffle" role="button" tabindex="0">shuffle</button>' +
+            '						<button class="jp-full-screen" role="button" tabindex="0">full screen</button>' +
+            '					</div>' +
+            '				</div>' +
+            '				<div class="jp-details">' +
+            '					<div class="jp-title" aria-label="title">&nbsp;</div>' +
             '				</div>' +
             '			</div>' +
             '		</div>' +
@@ -186,22 +189,18 @@ exports.pageMenu = {
     loggedIn: {
         mustache: "<li><a id=\"addallplaylist\" href=\"#\">Add all to playlist</a></li>\n" +
             "<li><a id=\"clearplaylist\" href=\"#\">Clear playlist</a></li>\n" +
-            "<li><a id=\"searchartist\" href=\"#\">Search Artist</a></li>\n" +
             "<li><a id=\"searchtitle\" href=\"#\">Search Title</a></li>\n" +
-            "<li><a id=\"searchalbum\" href=\"#\">Search Album</a></li>\n",
+            "<li><a id=\"searchgenre\" href=\"#\">Search Genre</a></li>\n",
         selectors: {
             "a#addallplaylist": {
                 click: function(e) {
                     e.preventDefault();
                     var myPlaylist = $("#player").data('myPlaylist');
-                    //var allsongs = [];
-                    var songrows = $("tr.song").each(function() {
+                    var videorows = $("tr.video").each(function() {
                         var row = $(this);
                         var doc = row.data("doc");
-                        //allsongs.push(doc);
                         myPlaylist.add(doc);
                     });
-                    //myPlaylist.setPlaylist(allsongs);
                     if (myPlaylist.play) {
                         myPlaylist.play();
                     }
@@ -215,27 +214,19 @@ exports.pageMenu = {
                     myPlaylist.setPlaylist([]);
                 }
             },
-            "a#searchartist": {
+            "a#searchgenre": {
                 click: function(e) {
                     e.preventDefault();
-                    var tmp = $("#searchinput").val().replace("album:", "").replace("artist:", "").replace("title:", "").replace("Search...", "");
-                    $("#searchinput").val("artist:" + tmp);
+                    var tmp = $("#searchinput").val().replace("genre:", "").replace("title:", "").replace("Search...", "");
+                    $("#searchinput").val("genre:" + tmp);
                     $("#searchinput").trigger('search', $("#searchinput").val());
                 }
             },
             "a#searchtitle": {
                 click: function(e) {
                     e.preventDefault();
-                    var tmp = $("#searchinput").val().replace("album:", "").replace("artist:", "").replace("title:", "").replace("Search...", "");
+                    var tmp = $("#searchinput").val().replace("genre:", "").replace("title:", "").replace("Search...", "");
                     $("#searchinput").val("title:" + tmp);
-                    $("#searchinput").trigger('search', $("#searchinput").val());
-                }
-            },
-            "a#searchalbum": {
-                click: function(e) {
-                    e.preventDefault();
-                    var tmp = $("#searchinput").val().replace("album:", "").replace("artist:", "").replace("title:", "").replace("Search...", "");
-                    $("#searchinput").val("album:" + tmp);
                     $("#searchinput").trigger('search', $("#searchinput").val());
                 }
             }
@@ -248,18 +239,14 @@ exports.searchBox = {
         var reqUrl;
         var view = "titles";
         if (!query || query === '') {
-            // show all songs
-            reqUrl = "./_ddoc/_view/songs?include_docs=true";
+            // show all videos
+            reqUrl = "./_ddoc/_view/videos?include_docs=true";
         } else {
-            var regexpartist = new RegExp("^artist:");
-            var regexpalbum = new RegExp("^album:");
+            var regexpgenre = new RegExp("^genre:");
             var regexptitle = new RegExp("^title:");
-            if (regexpartist.test(query)) {
-                query = query.replace("artist:", "");
-                view = "artists";
-            } else if (regexpalbum.test(query)) {
-                query = query.replace("album:", "");
-                view = "albums";
+            if (regexpgenre.test(query)) {
+                query = query.replace("genre:", "");
+                view = "genres";
             } else if (regexptitle.test(query)) {
                 query = query.replace("title:", "");
                 view = "titles";
