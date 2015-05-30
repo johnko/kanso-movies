@@ -6,9 +6,11 @@ Actually, it's a couchapp using HTML5's video tag. In the back-end the basic pri
 
 Movies on a couch... relaxing ;)
 
+![](https://github.com/johnko/kanso-movies/raw/master/screenshot.png)
+
 ## Requirements
 
-* CouchDB >=0.11 with couchdb-lucene (mapped as http://myhost/mydb/_fti)
+* CouchDB >=0.11
 * Couchapp >=0.6
 
 WEBM/OGV/MP4 is not supported by all browsers.
