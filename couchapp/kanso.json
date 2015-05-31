@@ -1,6 +1,6 @@
 {
     "name": "movies",
-    "version": "0.5.3",
+    "version": "0.5.4",
     "realname": "CloudBox",
     "description": "A couchapp made to enjoy movies... relaxed on a couch.",
     "attachments": ["static", "vendor"],

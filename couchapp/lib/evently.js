@@ -82,7 +82,7 @@ exports.list = {
         },
         mustache: "<table><tr>" +
             "<th class=\"title\">Title</th>" +
-            "<th class=\"type\">Title</th>" +
+            "<th class=\"type\">Type</th>" +
             "<th class=\"genre\">Genre</th>" +
             "</tr>" +
             "{{#videos}}<tr class=\"video {{rowClass}}\" id=\"video_{{_id}}\">" +
