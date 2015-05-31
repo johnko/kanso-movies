@@ -80,7 +80,17 @@ exports.list = {
                 })
             };
         },
-        mustache: "<table>\n\t<tr>\n\t\t<th class='title'>Title</th>\n\t\t<th class='genre'>Genre</th>\n\t</tr>\n{{#videos}}\n\t<tr class=\"video {{rowClass}}\" id=\"video_{{_id}}\">\n\t\t<td class='title'>{{title}}</td>\n\t\t<td class='genre'>{{genre}}</td>\n\t</tr>\n{{/videos}}\n</table>",
+        mustache: "<table><tr>" +
+            "<th class=\"title\">Title</th>" +
+            "<th class=\"type\">Title</th>" +
+            "<th class=\"genre\">Genre</th>" +
+            "</tr>" +
+            "{{#videos}}<tr class=\"video {{rowClass}}\" id=\"video_{{_id}}\">" +
+            "<td class=\"title\">{{title}}</td>" +
+            "<td class=\"type\">{{type}}</td>" +
+            "<td class=\"genre\">{{genre}}</td>" +
+            "</tr>{{/videos}}" +
+            "</table>",
         selectors: {
             "tr.video": {
                 click: function(e) {
