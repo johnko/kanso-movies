@@ -23,6 +23,7 @@ exports.list = {
             // start of function setDOCmp4ANDposter
             function setDOCmp4ANDposter(doc, name, type, prefix) {
                 var mp4extensions = ['.mp4'];
+                var mkvextensions = ['.mkv'];
                 if (doc.track) delete doc.track;
                 if (!doc.m4v && mp4extensions.indexOf(name.substring(name.length - 4).toLowerCase()) > -1) {
                     if (type == "dtfc") {
@@ -34,6 +35,17 @@ exports.list = {
                         doc.supplied += ', ';
                     }
                     doc.supplied += 'm4v';
+                }
+                if (!doc.webmv && mkvextensions.indexOf(name.substring(name.length - 4).toLowerCase()) > -1) {
+                    if (type == "dtfc") {
+                        doc.webmv = "/dtfc/" + doc.dtfc[name].sha512;
+                    } else if (type == "attachments") {
+                        doc.webmv = prefix + encodeURIComponent(doc._id) + '/' + encodeURIComponent(name);
+                    }
+                    if (doc.supplied.length > 1) {
+                        doc.supplied += ', ';
+                    }
+                    doc.supplied += 'webmv';
                 }
                 return doc;
             }
@@ -97,7 +109,7 @@ exports.player = {
                     enableRemoveControls: true
                 },
                 swfPath: "./vendor/jplayer/jplayer",
-                supplied: "m4v, ogv, webm",
+                supplied: "m4v, ogv, webmv",
                 useStateClassSkin: true,
                 autoBlur: true,
                 smoothPlayBar: false,
