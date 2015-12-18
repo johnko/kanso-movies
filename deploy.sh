@@ -1,7 +1,13 @@
 #!/bin/sh
 
-DBNAME=cloudbox
-DBURL=http://localhost:5984/${DBNAME}
+if [ "x" = "x$1" ]; then
+    HOST=localhost
+else
+    HOST=$1
+fi
+
+DBNAME=movies
+DBURL=http://${HOST}:5984/${DBNAME}
 
 APPFOLDER=couchapp
 
